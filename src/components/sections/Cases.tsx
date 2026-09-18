@@ -1,6 +1,5 @@
 import { ArrowUpRight } from "lucide-react";
 import { PhoneMockup } from "@/components/cases/PhoneMockup";
-import { podsekayScreens, promtShopScreens } from "@/components/cases/screens";
 import { Button } from "@/components/ui/Button";
 import { Container } from "@/components/ui/Container";
 import { Reveal } from "@/components/ui/Reveal";
@@ -12,11 +11,6 @@ import { cn } from "@/lib/utils";
 export function Cases({ dict }: { dict: Dictionary }) {
   const { cases, mockups } = dict;
 
-  const screensBySlug = {
-    "promt-shop": promtShopScreens(mockups.promtShop),
-    podsekay: podsekayScreens(mockups.podsekay),
-  };
-
   return (
     <section id="cases" className="scroll-mt-24 border-t border-white/10 py-24 md:py-32">
       <Container>
@@ -27,7 +21,7 @@ export function Cases({ dict }: { dict: Dictionary }) {
             const project = projects.find((entry) => entry.slug === item.slug);
             if (!project) return null;
 
-            const screens = screensBySlug[item.slug as keyof typeof screensBySlug];
+            const isShop = item.slug === "promt-shop";
             const flipped = index % 2 === 1;
 
             return (
@@ -39,7 +33,11 @@ export function Cases({ dict }: { dict: Dictionary }) {
                   className={cn("flex justify-center", flipped && "lg:order-2")}
                   distance={36}
                 >
-                  <PhoneMockup screens={screens} appName={item.title} />
+                  <PhoneMockup
+                    app={isShop ? "promt-shop" : "podsekay"}
+                    labels={isShop ? mockups.promtShop : mockups.podsekay}
+                    appName={item.title}
+                  />
                 </Reveal>
 
                 <div>

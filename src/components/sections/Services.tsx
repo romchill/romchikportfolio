@@ -1,4 +1,4 @@
-import { Bot, Database, Rocket, Smartphone, type LucideIcon } from "lucide-react";
+import { Bot, Database, Rocket, Smartphone, Sparkles, type LucideIcon } from "lucide-react";
 import { Container } from "@/components/ui/Container";
 import { Reveal } from "@/components/ui/Reveal";
 import { SectionTitle } from "@/components/ui/SectionTitle";
@@ -8,6 +8,7 @@ const icons: Record<string, LucideIcon> = {
   app: Smartphone,
   bot: Bot,
   server: Database,
+  ai: Sparkles,
   deploy: Rocket,
 };
 
