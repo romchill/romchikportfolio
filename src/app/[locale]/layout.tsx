@@ -44,7 +44,7 @@ export async function generateMetadata({
     description: dict.meta.description,
     alternates: {
       canonical: `/${locale}`,
-      languages: { ru: "/ru", en: "/en" },
+      languages: { ru: "/ru", en: "/en", "x-default": "/ru" },
     },
     openGraph: {
       type: "website",
@@ -96,10 +96,45 @@ export default async function RootLayout({
         />
       </head>
       <body className="flex min-h-full flex-col">
+        <a
+          href="#main"
+          className="skip-link"
+        >
+          {dict.a11y.skip}
+        </a>
+
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "Person",
+              name: site.name,
+              url: `${site.url}/${locale}`,
+              jobTitle:
+                locale === "ru" ? "Разработчик Telegram Mini Apps" : "Telegram Mini Apps developer",
+              description: dict.meta.description,
+              sameAs: [site.telegram],
+              knowsAbout: [
+                "Telegram Mini Apps",
+                "Telegram Bots",
+                "TypeScript",
+                "React",
+                "Node.js",
+                "Python",
+                "PostgreSQL",
+                "Docker",
+              ],
+            }),
+          }}
+        />
+
         <Preloader label={dict.preloader.label} />
         <Background />
         <Header locale={locale} dict={dict} />
-        <main className="flex flex-1 flex-col pt-16 md:pt-20">{children}</main>
+        <main id="main" className="flex flex-1 flex-col pt-16 md:pt-20">
+          {children}
+        </main>
         <Footer dict={dict} />
       </body>
     </html>

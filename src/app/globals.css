@@ -96,6 +96,23 @@
 }
 
 @layer components {
+  /* Ссылка «к содержимому»: видна только с клавиатуры */
+  .skip-link {
+    position: fixed;
+    top: 1rem;
+    left: -9999px;
+    z-index: 200;
+    border-radius: 9999px;
+    background-color: var(--color-chalk);
+    padding: 0.65rem 1.25rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--color-void);
+  }
+  .skip-link:focus {
+    left: 1rem;
+  }
+
   /* Тёмное стекло — базовая поверхность всех карточек */
   .glass {
     background-color: rgb(255 255 255 / 0.04);

@@ -25,6 +25,7 @@ export const en: Dictionary = {
     closeMenu: "Close menu",
     switchLanguage: "Switch language",
     toTop: "Back to top",
+    skip: "Skip to content",
   },
   hero: {
     badge: "Available for work",
@@ -176,6 +177,11 @@ export const en: Dictionary = {
       mainTimers: "Add timer",
       timersHint: "The alert reaches the bot even with the app closed",
     },
+  },
+  notFound: {
+    title: "This page is missing",
+    text: "There is no such page — the link may be outdated or the address has a typo. Everything is in place on the home page: services, work and contact.",
+    cta: "Go home",
   },
   contact: {
     eyebrow: "contact",

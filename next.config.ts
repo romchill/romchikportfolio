@@ -6,6 +6,10 @@ const nextConfig: NextConfig = {
   poweredByHeader: false,
   reactStrictMode: true,
   compress: true,
+  experimental: {
+    // Корневой layout лежит в [locale], поэтому 404 для чужих путей — отдельным файлом
+    globalNotFound: true,
+  },
   images: {
     formats: ["image/avif", "image/webp"],
   },
