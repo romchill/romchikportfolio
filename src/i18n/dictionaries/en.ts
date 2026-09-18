@@ -34,7 +34,7 @@ export const en: Dictionary = {
     tagline: "built end to end",
     lead: "I'm Roma. I build apps that live inside Telegram: someone taps a button in a bot and lands straight in the interface — no install, no sign-up, no passwords.",
     lead2:
-      "I take the whole project: screens, server, database, Stars payments, deployment to a VPS and support after launch. No need to hire a frontend dev, a backend dev and someone who knows Docker separately.",
+      "I take the whole project: screens, server, database, Stars payments, deployment to a VPS and support after launch. No need to hire a frontend dev, a backend dev and someone who knows Docker separately. I build with a model alongside me, so timelines are shorter than usual and the price is lower.",
     stats: [
       { value: "2", label: "live projects in Telegram" },
       { value: "Fullstack", label: "interface, server, database, bot" },
@@ -46,7 +46,7 @@ export const en: Dictionary = {
     eyebrow: "services",
     title: "What I do",
     description:
-      "Five areas that usually come as a set. You can take one, but most projects arrive whole — from the first screen to the server that serves it.",
+      "Four areas that usually come as a set. You can take one, but most projects arrive whole — from the first screen to the server that serves it.",
     items: [
       {
         icon: "app",
@@ -79,17 +79,6 @@ export const en: Dictionary = {
           "PostgreSQL with migrations, not manual edits",
           "Input validation at the boundary",
           "Tests on the money paths",
-        ],
-      },
-      {
-        icon: "ai",
-        title: "AI inside the product",
-        text: "A model as a working part of the app, not a badge on a landing page. Text generated for the user's request, recognition from a photo, an assistant right inside the bot chat.",
-        bullets: [
-          "Claude, GPT and DeepSeek over API, with a fallback model",
-          "Recognition from screenshots and photos",
-          "Answers stream in instead of landing a minute later",
-          "Limits and a kill switch: the token bill stays on the ground",
         ],
       },
       {
@@ -307,12 +296,17 @@ export const en: Dictionary = {
     paragraphs: [
       "A mini app is not a website opened inside Telegram. It's a separate kind of product with its own rules: no address bar, no tabs, no patience for loading. If the first screen stalls, there is no second screen — the person closes the window and goes back to the chat.",
       "So I don't start with design. I start by asking which single action the person opens the app for. Everything else is built around it, and extra screens get cut before anyone writes them. The project ends up smaller, cheaper and shipping sooner.",
+      "A model speeds the build up. The routine — standard screens, plumbing, migrations, tests — it writes faster than I do, and that saves the project weeks. The decisions stay mine: what we build, how it works inside, where the security boundaries are and what actually ships. Code I did not understand does not go into the project.",
       "After that it's ordinary engineering with no magic: typed code, validation of everything from outside, database migrations instead of manual edits, tests on the money paths, and a compose file that brings the whole thing up with one command on any machine.",
     ],
     points: [
       {
         title: "One language for API and bot",
         text: "TypeScript or Python across the whole project. Logic doesn't drift between services, and nothing has to be written twice.",
+      },
+      {
+        title: "I build with AI",
+        text: "No secret and nothing to be shy about: the model writes the routine, I keep the architecture, the security and the review. That is why a mini app costs less and ships sooner than one assembled by hand from scratch.",
       },
       {
         title: "Secrets stay out of the code",
