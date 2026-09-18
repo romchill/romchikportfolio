@@ -1,0 +1,48 @@
+@import "tailwindcss";
+
+/* ──────────────────────────────────────────────────────────
+   Базовые токены. Полная дизайн-система приедет на Шаге 3.
+   ────────────────────────────────────────────────────────── */
+@theme {
+  /* Фон: чистый чёрный → тёмно-синий Telegram */
+  --color-ink-950: #05070a;
+  --color-ink-900: #080c12;
+  --color-ink-800: #0e1621;
+  --color-ink-700: #17212b;
+
+  /* Акцент — фирменный синий Telegram */
+  --color-tg-400: #54c1f5;
+  --color-tg-500: #2aabee;
+  --color-tg-600: #229ed9;
+
+  --color-chalk: #eef2f6;
+  --color-muted: #8b95a3;
+  --color-faint: #525c6a;
+}
+
+@layer base {
+  html {
+    color-scheme: dark;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  body {
+    background-color: var(--color-ink-950);
+    color: var(--color-chalk);
+  }
+
+  ::selection {
+    background-color: color-mix(in oklab, var(--color-tg-500) 35%, transparent);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+}
