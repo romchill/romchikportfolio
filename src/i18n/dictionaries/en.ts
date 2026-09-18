@@ -118,10 +118,10 @@ export const en: Dictionary = {
       {
         slug: "podsekay",
         title: "Podsekay",
-        tagline: "Mini App · fishing companion",
-        text: "It measures how profitable a fishing session is while it happens: how much silver per hour a spot brings, how much went on bait, and whether it is worth staying. The phone sits next to the keyboard and finally earns its place.",
+        tagline: "Mini App · for Russian Fishing 4",
+        text: "A companion for Russian Fishing 4 players. It measures how profitable a session is while it happens: how much silver per hour a spot brings, how much went on bait, and whether the spot is worth staying on. The phone sits next to the keyboard and finally earns its place.",
         features: [
-          "Live session tracker: silver per hour, weight and bait spend",
+          "Live tracker for RF4: silver per hour, weight and bait spend",
           "Add a catch from a screenshot — a vision model reads it",
           "Bait and PVA timers with notifications straight to Telegram",
           "History of sessions and spot-to-spot comparison",
@@ -176,6 +176,23 @@ export const en: Dictionary = {
       mainTimers: "Add timer",
       timersHint: "The alert reaches the bot even with the app closed",
     },
+  },
+  contact: {
+    eyebrow: "contact",
+    badge: "Available for work",
+    line1: "YOUR IDEA?",
+    line2: "TEXT ME",
+    text: "Describe in a couple of sentences what you want to build — I'll tell you whether it works inside Telegram, how long it takes and what it costs. If it isn't my kind of task, I'll say so instead of wasting your time.",
+    text2:
+      "I reply within a day. If it's urgent, say so and we'll move faster. Talking costs nothing: you can simply ask whether a mini app makes sense for your case at all.",
+    cta: "Message me on Telegram",
+    handleLabel: "direct messages",
+    copy: "Copy",
+    copied: "Copied",
+  },
+  footer: {
+    built: "Built with Next.js, Tailwind and Docker",
+    toTop: "Back to top",
   },
   approach: {
     eyebrow: "approach",

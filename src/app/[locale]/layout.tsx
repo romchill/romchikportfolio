@@ -4,6 +4,7 @@ import { Inter, Unbounded } from "next/font/google";
 import { notFound } from "next/navigation";
 import "../globals.css";
 import { Background } from "@/components/layout/Background";
+import { Footer } from "@/components/layout/Footer";
 import { Header } from "@/components/layout/Header";
 import { Preloader } from "@/components/layout/Preloader";
 import { site } from "@/content/site";
@@ -99,6 +100,7 @@ export default async function RootLayout({
         <Background />
         <Header locale={locale} dict={dict} />
         <main className="flex flex-1 flex-col pt-16 md:pt-20">{children}</main>
+        <Footer dict={dict} />
       </body>
     </html>
   );

@@ -17,7 +17,7 @@ export function Hero({ dict }: { dict: Dictionary }) {
         </Reveal>
 
         <Reveal delay={0.08}>
-          <h1 className="font-display mt-8 text-[15vw] leading-[0.92] font-black tracking-tighter md:mt-10 md:text-[10.5vw]">
+          <h1 className="font-display mt-8 text-[min(12.5vw,170px)] leading-[0.92] font-black tracking-tighter md:mt-10">
             <span className="block">{hero.line1}</span>
             <span className="text-stroke block">{hero.line2}</span>
           </h1>
