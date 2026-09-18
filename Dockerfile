@@ -26,7 +26,10 @@ CMD ["npm", "run", "dev", "--", "-H", "0.0.0.0"]
 # ─────────────────────────────────────────────────────────────
 FROM node:22-alpine AS builder
 WORKDIR /app
-ENV NEXT_TELEMETRY_DISABLED=1
+# Адрес сайта попадает в canonical, og:url и sitemap на этапе сборки,
+# поэтому его нужно знать здесь, а не при запуске контейнера
+ARG NEXT_PUBLIC_SITE_URL=http://localhost:3000
+ENV NEXT_TELEMETRY_DISABLED=1     NEXT_PUBLIC_SITE_URL=${NEXT_PUBLIC_SITE_URL}
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 RUN npm run build

@@ -96,10 +96,7 @@ export default async function RootLayout({
         />
       </head>
       <body className="flex min-h-full flex-col">
-        <a
-          href="#main"
-          className="skip-link"
-        >
+        <a href="#main" className="skip-link">
           {dict.a11y.skip}
         </a>
 

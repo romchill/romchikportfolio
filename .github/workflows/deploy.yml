@@ -1,0 +1,30 @@
+# Запускается вручную: Actions → Deploy → Run workflow.
+# Нужны секреты репозитория: SSH_HOST, SSH_USER, SSH_KEY, а на сервере —
+# склонированный репозиторий с заполненным .env.
+name: Deploy
+
+on:
+  workflow_dispatch:
+    inputs:
+      path:
+        description: Путь к проекту на сервере
+        required: false
+        default: /opt/portfolio
+
+jobs:
+  deploy:
+    name: Выкатить на сервер
+    runs-on: ubuntu-latest
+    steps:
+      - name: Обновить и перезапустить
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_KEY }}
+          script: |
+            set -e
+            cd ${{ inputs.path }}
+            git pull --ff-only
+            docker compose -f docker-compose.prod.yml up -d --build
+            docker image prune -f
