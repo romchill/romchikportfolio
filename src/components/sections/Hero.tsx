@@ -44,7 +44,7 @@ export function Hero({ dict }: { dict: Dictionary }) {
               <Send className="size-4" aria-hidden />
               {cta.order}
             </Button>
-            <Button href="#services" variant="ghost" size="lg">
+            <Button href="#cases" variant="ghost" size="lg">
               {cta.cases}
               <ArrowDown className="size-4" aria-hidden />
             </Button>
