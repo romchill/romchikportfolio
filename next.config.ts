@@ -9,6 +9,12 @@ const nextConfig: NextConfig = {
   images: {
     formats: ["image/avif", "image/webp"],
   },
+  async redirects() {
+    return [
+      // Корень отдаём русской версии; язык живёт в пути
+      { source: "/", destination: "/ru", permanent: false },
+    ];
+  },
 };
 
 export default nextConfig;
