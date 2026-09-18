@@ -1,0 +1,21 @@
+# Разработка с горячей перезагрузкой:
+#   docker compose -f docker-compose.dev.yml up --build
+# Исходники монтируются внутрь, node_modules и .next остаются контейнерными.
+services:
+  web:
+    build:
+      context: .
+      target: dev
+    container_name: portfolio-dev
+    environment:
+      NODE_ENV: development
+      # Под Windows события файловой системы не проходят через bind-mount,
+      # поэтому Next следит за файлами опросом
+      WATCHPACK_POLLING: "true"
+      CHOKIDAR_USEPOLLING: "true"
+    ports:
+      - "3000:3000"
+    volumes:
+      - .:/app
+      - /app/node_modules
+      - /app/.next
