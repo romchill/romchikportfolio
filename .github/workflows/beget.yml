@@ -1,0 +1,62 @@
+# Собирает статику и заливает её на обычный хостинг (Beget) при каждом пуше.
+#
+# Что нужно завести в репозитории один раз:
+#   Secrets   → BEGET_SSH_KEY   закрытая часть ключа (весь файл целиком)
+#   Variables → BEGET_HOST      например sXXXXXX.h1.beget.tech
+#   Variables → BEGET_USER      логин аккаунта
+#   Variables → BEGET_PATH      /home/<логин>/romapp.ru/public_html/
+#
+# Пока ключа нет, шаг заливки тихо пропускается и пуши не падают.
+#
+# ВНИМАНИЕ: заливка идёт с --delete, то есть содержимое папки на хостинге
+# приводится в точности к содержимому out/. Путь BEGET_PATH должен вести
+# именно в public_html нужного домена и никуда больше.
+name: Beget
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: beget
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    name: Собрать и залить
+    runs-on: ubuntu-latest
+    env:
+      HAS_KEY: ${{ secrets.BEGET_SSH_KEY != '' }}
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      - name: Собрать статику
+        run: npm run build:static
+
+      - name: Проверить, что собралось главное
+        run: |
+          test -f out/ru/index.html
+          test -f out/en/index.html
+          test -f out/index.html
+          test -f out/opengraph-image.png
+          echo "файлов в сборке: $(find out -type f | wc -l)"
+
+      - name: Залить на хостинг
+        if: env.HAS_KEY == 'true'
+        uses: easingthemes/ssh-deploy@v6.0.1
+        with:
+          SSH_PRIVATE_KEY: ${{ secrets.BEGET_SSH_KEY }}
+          REMOTE_HOST: ${{ vars.BEGET_HOST }}
+          REMOTE_USER: ${{ vars.BEGET_USER }}
+          TARGET: ${{ vars.BEGET_PATH }}
+          SOURCE: out/
+          ARGS: -rlgoDzvc --delete
+          EXCLUDE: ""

@@ -41,7 +41,7 @@ export default function GlobalNotFound() {
             {dict.notFound.text}
           </p>
           <a
-            href={`/${defaultLocale}`}
+            href={`/${defaultLocale}/`}
             className="bg-chalk text-void mt-9 inline-flex h-14 items-center rounded-full px-7 text-[15px] font-medium transition-colors duration-300 hover:bg-white/90"
           >
             {dict.notFound.cta}

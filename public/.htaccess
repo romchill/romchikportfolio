@@ -1,0 +1,23 @@
+# Обычный хостинг на Apache: страница 404 и кэш для статики.
+# Адреса вида /ru/ работают сами — страницы лежат как ru/index.html.
+
+ErrorDocument 404 /404.html
+
+DirectoryIndex index.html
+
+<IfModule mod_deflate.c>
+  AddOutputFilterByType DEFLATE text/html text/css text/plain text/xml
+  AddOutputFilterByType DEFLATE application/javascript application/json image/svg+xml
+</IfModule>
+
+# Хэшированные бандлы Next можно кэшировать навсегда
+<IfModule mod_headers.c>
+  <FilesMatch "\.(js|css|woff2|png|jpg|svg|avif|webp)$">
+    Header set Cache-Control "public, max-age=31536000, immutable"
+  </FilesMatch>
+  <FilesMatch "\.(html|xml|txt)$">
+    Header set Cache-Control "public, max-age=0, must-revalidate"
+  </FilesMatch>
+  Header set X-Content-Type-Options "nosniff"
+  Header set Referrer-Policy "strict-origin-when-cross-origin"
+</IfModule>

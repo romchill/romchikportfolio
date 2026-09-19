@@ -19,7 +19,7 @@ export default async function NotFound() {
         </h1>
         <p className="text-muted mt-5 max-w-md text-[15px] leading-relaxed">{dict.notFound.text}</p>
         <div className="mt-9">
-          <Button href={`/${current}`} size="lg" magnetic>
+          <Button href={`/${current}/`} size="lg" magnetic>
             {dict.notFound.cta}
           </Button>
         </div>

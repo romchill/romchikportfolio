@@ -9,6 +9,9 @@ const staticExport = process.env.BUILD_TARGET === "static";
 
 const nextConfig: NextConfig = {
   output: staticExport ? "export" : "standalone",
+  // Адреса со слешем на конце: экспорт кладёт страницы как ru/index.html,
+  // и их отдаёт любой хостинг без своих правил переписывания
+  trailingSlash: true,
   poweredByHeader: false,
   reactStrictMode: true,
   compress: true,

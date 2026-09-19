@@ -47,7 +47,7 @@ export function Header({ locale, dict }: Props) {
       >
         <Container className="flex h-16 items-center justify-between md:h-20">
           <a
-            href={`/${locale}`}
+            href={`/${locale}/`}
             className="group font-display text-lg font-bold tracking-tight transition-opacity hover:opacity-80"
           >
             {site.name.toLowerCase()}
