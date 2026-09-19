@@ -1,0 +1,50 @@
+# Собирает статику и выкатывает её на Cloudflare Pages при каждом пуше в main.
+# Pull request получает свой адрес для предпросмотра.
+#
+# Что нужно один раз настроить в репозитории:
+#   Secrets   → CLOUDFLARE_API_TOKEN   токен с правом Cloudflare Pages: Edit
+#   Variables → CLOUDFLARE_ACCOUNT_ID  идентификатор аккаунта
+#
+# Пока секрета нет, шаг выкатки тихо пропускается и пуши не падают.
+name: Pages
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: pages-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    name: Собрать и выкатить
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      deployments: write
+    env:
+      # Пока секрет не заведён, выкатка пропускается
+      HAS_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN != '' }}
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      - name: Собрать статику
+        run: npm run build:static
+
+      - name: Выкатить на Cloudflare Pages
+        if: env.HAS_TOKEN == 'true'
+        uses: cloudflare/wrangler-action@v4
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}
+          command: pages deploy out --project-name=romapp --branch=${{ github.head_ref || github.ref_name }}

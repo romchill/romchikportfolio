@@ -10,9 +10,9 @@
 #   Secrets   → SSH_HOST, SSH_USER, SSH_KEY
 name: Deploy
 
+# Запускается только вручную: сайт живёт на Cloudflare Pages,
+# а Docker-образ нужен, лишь если однажды переедем на свой сервер.
 on:
-  push:
-    branches: [main]
   workflow_dispatch:
 
 concurrency:
