@@ -82,7 +82,7 @@ http://localhost, проверка живости — http://localhost/api/healt
 
 ### 1. Купить домен
 
-Любой регистратор, ~250 ₽ за первый год в зоне `.ru`.
+Домен уже куплен: **romapp.ru**.
 
 ### 2. Подключить репозиторий
 
@@ -91,19 +91,20 @@ http://localhost, проверка живости — http://localhost/api/healt
 
 Настройки сборки:
 
-| Поле                   | Значение                                      |
-| ---------------------- | --------------------------------------------- |
-| Framework preset       | None                                          |
-| Build command          | `npm run build:static`                        |
-| Build output directory | `out`                                         |
-| Переменная окружения   | `NEXT_PUBLIC_SITE_URL` = `https://твой-домен` |
+| Поле                   | Значение                                     |
+| ---------------------- | -------------------------------------------- |
+| Framework preset       | None                                         |
+| Build command          | `npm run build:static`                       |
+| Build output directory | `out`                                        |
+| Переменная окружения   | `NEXT_PUBLIC_SITE_URL` = `https://romapp.ru` |
 
-Переменную задать **до первой сборки**: адрес запекается в canonical,
-`og:url` и карту сайта. Забыл — просто пересобери (Deployments → Retry).
+Переменная необязательна: боевой адрес зашит значением по умолчанию
+в `src/content/site.ts`, так что ссылки будут правильными в любом случае.
+Задавать её стоит, только если домен когда-нибудь сменится.
 
 ### 3. Привязать домен
 
-В проекте → **Custom domains** → **Set up a domain** → ввести домен.
+В проекте → **Custom domains** → **Set up a domain** → `romapp.ru`.
 Cloudflare сам выпустит сертификат и включит HTTPS.
 
 Корень `/` уводит на `/ru` файлом `public/_redirects`, а на хостингах без
@@ -167,9 +168,9 @@ cp .env.example .env && nano .env
 Заполнить три строки:
 
 ```
-NEXT_PUBLIC_SITE_URL=https://твой-домен
-DOMAIN=твой-домен
-CERTBOT_EMAIL=почта@для-уведомлений
+NEXT_PUBLIC_SITE_URL=https://romapp.ru
+DOMAIN=romapp.ru
+CERTBOT_EMAIL=vvvvc636@gmail.com
 ```
 
 Тот же адрес нужно положить в переменную репозитория на GitHub:
