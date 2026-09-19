@@ -12,3 +12,8 @@ export const localeNames: Record<Locale, string> = {
 export function isLocale(value: string): value is Locale {
   return (locales as readonly string[]).includes(value);
 }
+
+/** Адрес главной для локали: русская живёт в корне, английская — в /en/ */
+export function localePath(locale: Locale): string {
+  return locale === defaultLocale ? "/" : `/${locale}/`;
+}

@@ -92,7 +92,7 @@ export function PhoneMockup({
         style={{ rotateX, rotateY, transformPerspective: 1400 }}
         className="relative w-[272px] shrink-0 sm:w-[300px]"
       >
-        <div className="bg-coal-800 relative rounded-[2.6rem] border border-white/15 p-[9px] shadow-[0_50px_120px_-50px_#000]">
+        <div className="bg-coal-800 relative rounded-[2.6rem] border border-white/15 p-[9px] shadow-[0_20px_40px_-20px_#000] md:shadow-[0_50px_120px_-50px_#000]">
           <div className="pointer-events-none absolute inset-0 rounded-[2.6rem] bg-linear-to-b from-white/10 via-transparent to-transparent" />
 
           <div className="bg-void relative flex aspect-[9/19] flex-col overflow-hidden rounded-[2.1rem]">

@@ -1,14 +1,12 @@
-import type { Metadata, Viewport } from "next";
 import type { ReactNode } from "react";
 import { Inter, Unbounded } from "next/font/google";
-import { notFound } from "next/navigation";
-import "../globals.css";
-import { Background } from "@/components/layout/Background";
-import { Footer } from "@/components/layout/Footer";
-import { Header } from "@/components/layout/Header";
-import { Preloader } from "@/components/layout/Preloader";
+import { Background } from "./Background";
+import { Footer } from "./Footer";
+import { Header } from "./Header";
+import { Preloader } from "./Preloader";
 import { site } from "@/content/site";
-import { getDictionary, isLocale, locales } from "@/i18n";
+import { getDictionary } from "@/i18n";
+import { localePath, type Locale } from "@/i18n/config";
 
 const display = Unbounded({
   subsets: ["latin", "cyrillic"],
@@ -22,70 +20,12 @@ const sans = Inter({
   display: "swap",
 });
 
-export const dynamicParams = false;
-
-export function generateStaticParams() {
-  return locales.map((locale) => ({ locale }));
-}
-
-export async function generateMetadata({
-  params,
-}: {
-  params: Promise<{ locale: string }>;
-}): Promise<Metadata> {
-  const { locale } = await params;
-  if (!isLocale(locale)) return {};
-
-  const dict = getDictionary(locale);
-
-  return {
-    metadataBase: new URL(site.url),
-    title: dict.meta.title,
-    description: dict.meta.description,
-    alternates: {
-      canonical: `/${locale}`,
-      languages: { ru: "/ru", en: "/en", "x-default": "/ru" },
-    },
-    openGraph: {
-      type: "website",
-      siteName: site.name,
-      url: `/${locale}`,
-      locale: locale === "ru" ? "ru_RU" : "en_US",
-      title: dict.meta.title,
-      description: dict.meta.description,
-      images: [
-        {
-          url: "/opengraph-image.png",
-          width: 1200,
-          height: 630,
-          alt: "Romchik — Telegram Mini Apps",
-        },
-      ],
-    },
-    twitter: {
-      card: "summary_large_image",
-      title: dict.meta.title,
-      description: dict.meta.description,
-      images: ["/opengraph-image.png"],
-    },
-  };
-}
-
-export const viewport: Viewport = {
-  themeColor: "#05070a",
-  colorScheme: "dark",
-};
-
-export default async function RootLayout({
-  children,
-  params,
-}: {
-  children: ReactNode;
-  params: Promise<{ locale: string }>;
-}) {
-  const { locale } = await params;
-  if (!isLocale(locale)) notFound();
-
+/**
+ * Общая оболочка страницы. У русской и английской версий свои корневые
+ * layout-файлы — иначе не получилось бы держать русскую в корне сайта, —
+ * а вся начинка живёт здесь, в одном месте.
+ */
+export function RootShell({ locale, children }: { locale: Locale; children: ReactNode }) {
   const dict = getDictionary(locale);
 
   return (
@@ -95,6 +35,9 @@ export default async function RootLayout({
       // Инлайн-скрипт ниже дописывает класс rp-skip до гидратации
       suppressHydrationWarning
     >
+      {/* eslint-disable-next-line @next/next/no-head-element --
+          правило про Pages Router; в App Router <head> в корневом
+          layout — штатный способ, а скрипт обязан выполниться до отрисовки */}
       <head>
         {/* Прелоадер показываем один раз за сессию — без мигания при переходах */}
         <script
@@ -116,7 +59,7 @@ export default async function RootLayout({
               "@context": "https://schema.org",
               "@type": "Person",
               name: site.name,
-              url: `${site.url}/${locale}`,
+              url: `${site.url}${localePath(locale)}`,
               jobTitle:
                 locale === "ru" ? "Разработчик Telegram Mini Apps" : "Telegram Mini Apps developer",
               description: dict.meta.description,

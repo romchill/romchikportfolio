@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/Button";
 import { Container } from "@/components/ui/Container";
 import { LocaleSwitch } from "./LocaleSwitch";
 import type { Dictionary } from "@/i18n";
-import type { Locale } from "@/i18n/config";
+import { localePath, type Locale } from "@/i18n/config";
 import { site } from "@/content/site";
 import { easeOutExpo } from "@/lib/motion";
 import { cn } from "@/lib/utils";
@@ -41,13 +41,15 @@ export function Header({ locale, dict }: Props) {
         className={cn(
           "fixed inset-x-0 top-0 z-50 transition-all duration-500 ease-[var(--ease-out-expo)]",
           scrolled
-            ? "bg-void/70 border-b border-white/[0.07] backdrop-blur-xl"
+            ? // На телефоне сплошной фон вместо размытия: backdrop-filter
+              // заставляет перерисовывать шапку на каждый кадр прокрутки
+              "bg-void/95 md:bg-void/70 border-b border-white/[0.07] md:backdrop-blur-xl"
             : "border-b border-transparent",
         )}
       >
         <Container className="flex h-16 items-center justify-between md:h-20">
           <a
-            href={`/${locale}/`}
+            href={localePath(locale)}
             className="group font-display text-lg font-bold tracking-tight transition-opacity hover:opacity-80"
           >
             {site.name.toLowerCase()}

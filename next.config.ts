@@ -24,15 +24,6 @@ const nextConfig: NextConfig = {
     unoptimized: staticExport,
     formats: ["image/avif", "image/webp"],
   },
-  // Редиректы умеет только сервер. В статике корень уводит на /ru
-  // файл public/_redirects (Cloudflare) и public/index.html (запасной путь).
-  ...(staticExport
-    ? {}
-    : {
-        async redirects() {
-          return [{ source: "/", destination: "/ru", permanent: false }];
-        },
-      }),
 };
 
 export default nextConfig;

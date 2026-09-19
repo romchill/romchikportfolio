@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Inter, Unbounded } from "next/font/google";
 import "./globals.css";
 import { getDictionary, defaultLocale } from "@/i18n";
+import { localePath } from "@/i18n/config";
 
 // Файл в обход layout: стили и шрифты подключаем здесь сами
 const display = Unbounded({
@@ -41,7 +42,7 @@ export default function GlobalNotFound() {
             {dict.notFound.text}
           </p>
           <a
-            href={`/${defaultLocale}/`}
+            href={localePath(defaultLocale)}
             className="bg-chalk text-void mt-9 inline-flex h-14 items-center rounded-full px-7 text-[15px] font-medium transition-colors duration-300 hover:bg-white/90"
           >
             {dict.notFound.cta}

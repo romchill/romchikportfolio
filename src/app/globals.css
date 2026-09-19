@@ -191,6 +191,36 @@
   }
 }
 
+/* ── Мобильные: убираем то, что дорого считать на слабом GPU ──────────
+   backdrop-filter и blend-режимы заставляют браузер перерисовывать
+   слой на каждый кадр прокрутки. На чёрном фоне разница в картинке
+   почти незаметна, а анимации перестают дёргаться. */
+@media (max-width: 767px) {
+  .glass,
+  .glass-strong {
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
+
+  .glass {
+    background-color: rgb(18 18 18 / 0.92);
+  }
+
+  .glass-strong {
+    background-color: rgb(26 26 26 / 0.94);
+  }
+
+  /* Зерно поверх всего экрана с mix-blend-mode — самый дорогой слой */
+  .noise-overlay {
+    display: none;
+  }
+
+  /* Бесконечная лента: обещаем браузеру, что двигаем только трансформ */
+  .marquee-track {
+    will-change: transform;
+  }
+}
+
 @keyframes marquee {
   to {
     transform: translateX(-100%);
