@@ -53,11 +53,20 @@ export async function generateMetadata({
       locale: locale === "ru" ? "ru_RU" : "en_US",
       title: dict.meta.title,
       description: dict.meta.description,
+      images: [
+        {
+          url: "/opengraph-image.png",
+          width: 1200,
+          height: 630,
+          alt: "Romchik — Telegram Mini Apps",
+        },
+      ],
     },
     twitter: {
       card: "summary_large_image",
       title: dict.meta.title,
       description: dict.meta.description,
+      images: ["/opengraph-image.png"],
     },
   };
 }

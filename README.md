@@ -35,7 +35,17 @@ npm run dev
 npm run check
 ```
 
-Прогоняет `typecheck` → `lint` → `build`. Отдельно есть `npm run format`
+Собрать можно двумя способами:
+
+```bash
+npm run build          # сервер для Docker
+```
+
+```bash
+npm run build:static   # папка out/ для бесплатного хостинга
+```
+
+`npm run check` прогоняет `typecheck` → `lint` → `build`. Отдельно есть `npm run format`
 и `npm run format:check` — последний гоняется в CI, так что перед коммитом
 стоит прогнать `npm run format`.
 
@@ -65,7 +75,49 @@ npm run docker:prod
 (gzip, вечный кэш хэшированных бандлов, security-заголовки). Сайт — на
 http://localhost, проверка живости — http://localhost/api/health
 
-## Выкладка на свой сервер
+## Выкладка: бесплатно на Cloudflare Pages
+
+Сайт целиком статический — 2.3 МБ готовых файлов. Серверу нечего выполнять,
+поэтому хостинг ничего не стоит: платишь только за домен.
+
+### 1. Купить домен
+
+Любой регистратор, ~250 ₽ за первый год в зоне `.ru`.
+
+### 2. Подключить репозиторий
+
+На [dash.cloudflare.com](https://dash.cloudflare.com) → **Workers & Pages** →
+**Create** → **Pages** → **Connect to Git** → выбрать `romchikportfolio`.
+
+Настройки сборки:
+
+| Поле                   | Значение                                      |
+| ---------------------- | --------------------------------------------- |
+| Framework preset       | None                                          |
+| Build command          | `npm run build:static`                        |
+| Build output directory | `out`                                         |
+| Переменная окружения   | `NEXT_PUBLIC_SITE_URL` = `https://твой-домен` |
+
+Переменную задать **до первой сборки**: адрес запекается в canonical,
+`og:url` и карту сайта. Забыл — просто пересобери (Deployments → Retry).
+
+### 3. Привязать домен
+
+В проекте → **Custom domains** → **Set up a domain** → ввести домен.
+Cloudflare сам выпустит сертификат и включит HTTPS.
+
+Корень `/` уводит на `/ru` файлом `public/_redirects`, а на хостингах без
+его поддержки — страничкой `public/index.html`.
+
+### 4. Дальше само
+
+Каждый пуш в `main` пересобирает и выкатывает сайт. Pull request получает
+свой адрес для предпросмотра.
+
+## Выкладка: свой сервер
+
+Нужен, если однажды понадобится настоящий сервер — форма заявок с записью
+в базу, админка или бот на том же домене. До тех пор статики достаточно.
 
 Пошагово, от пустого VPS до работающего сайта на своём домене.
 Сборка образа идёт в GitHub Actions, поэтому серверу хватает 1 ГБ памяти:
@@ -194,6 +246,8 @@ cat ~/.ssh/deploy.pub >> ~/.ssh/authorized_keys && cat ~/.ssh/deploy
 
 ## CI и деплой
 
+Статический хостинг собирает сайт сам, на GitHub Actions остаётся Docker-путь:
+
 - `ci.yml` — на каждый push и pull request: типы, линт, формат, сборка.
   Образ дополнительно проверяется на pull request.
 - `deploy.yml` — на push в `main`: собирает образ, кладёт в GHCR и, если
@@ -209,7 +263,7 @@ portfolio/
 │   │   ├── [locale]/          локаль в пути: layout, страница, 404, og-картинка
 │   │   ├── api/health/        эндпоинт живости для Docker и Nginx
 │   │   ├── global-not-found.tsx   404 для адресов вне локалей
-│   │   ├── sitemap.ts, robots.ts
+│   │   ├── sitemap.ts, robots.ts, opengraph-image.png
 │   │   └── globals.css        дизайн-система: токены и слои
 │   ├── components/
 │   │   ├── layout/            шапка, футер, прелоадер, фон
@@ -219,6 +273,7 @@ portfolio/
 │   ├── content/               ссылки, проекты, стек
 │   ├── i18n/                  словари RU и EN
 │   └── lib/                   утилиты и параметры анимации
+├── public/                    _redirects и index.html: корень → /ru
 ├── infra/nginx/               http.conf и шаблон с TLS
 ├── Dockerfile                 deps → dev → builder → runner
 ├── docker-compose.yml         прод без HTTPS

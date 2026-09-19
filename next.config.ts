@@ -1,8 +1,14 @@
 import type { NextConfig } from "next";
 
+/**
+ * Две цели сборки из одного кода:
+ *   npm run build         — сервер в Docker (output: standalone)
+ *   npm run build:static  — папка out/ для бесплатного хостинга
+ */
+const staticExport = process.env.BUILD_TARGET === "static";
+
 const nextConfig: NextConfig = {
-  // Собирает минимальный самодостаточный сервер — основа лёгкого Docker-образа
-  output: "standalone",
+  output: staticExport ? "export" : "standalone",
   poweredByHeader: false,
   reactStrictMode: true,
   compress: true,
@@ -11,14 +17,19 @@ const nextConfig: NextConfig = {
     globalNotFound: true,
   },
   images: {
+    // В статике оптимизировать некому: картинки отдаются как есть
+    unoptimized: staticExport,
     formats: ["image/avif", "image/webp"],
   },
-  async redirects() {
-    return [
-      // Корень отдаём русской версии; язык живёт в пути
-      { source: "/", destination: "/ru", permanent: false },
-    ];
-  },
+  // Редиректы умеет только сервер. В статике корень уводит на /ru
+  // файл public/_redirects (Cloudflare) и public/index.html (запасной путь).
+  ...(staticExport
+    ? {}
+    : {
+        async redirects() {
+          return [{ source: "/", destination: "/ru", permanent: false }];
+        },
+      }),
 };
 
 export default nextConfig;
