@@ -1,0 +1,62 @@
+# Собирает статику и публикует её на GitHub Pages при каждом пуше в main.
+#
+# Настраивать ничего не нужно: доступ выдаётся самим GitHub через OIDC,
+# никаких токенов и секретов. Домен берётся из файла public/CNAME.
+name: GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Одновременно едет только одна публикация, начатую не обрываем
+concurrency:
+  group: github-pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    name: Собрать
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      - name: Собрать статику
+        run: npm run build:static
+
+      - name: Проверить сборку
+        run: |
+          test -f out/ru/index.html
+          test -f out/en/index.html
+          test -f out/.nojekyll
+          test -f out/CNAME
+          echo "файлов: $(find out -type f | wc -l)"
+
+      - uses: actions/configure-pages@v6
+
+      - uses: actions/upload-pages-artifact@v5
+        with:
+          path: out
+
+  deploy:
+    name: Опубликовать
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v5
