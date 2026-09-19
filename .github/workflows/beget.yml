@@ -43,9 +43,8 @@ jobs:
 
       - name: Проверить, что собралось главное
         run: |
-          test -f out/ru/index.html
-          test -f out/en/index.html
           test -f out/index.html
+          test -f out/en/index.html
           test -f out/opengraph-image.png
           echo "файлов в сборке: $(find out -type f | wc -l)"
 

@@ -38,7 +38,7 @@ jobs:
 
       - name: Проверить сборку
         run: |
-          test -f out/ru/index.html
+          test -f out/index.html
           test -f out/en/index.html
           test -f out/.nojekyll
           test -f out/CNAME
