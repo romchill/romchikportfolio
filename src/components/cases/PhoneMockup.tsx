@@ -1,7 +1,22 @@
 "use client";
 
-import { useEffect, useMemo, useState, type PointerEvent, type ReactNode } from "react";
-import { AnimatePresence, motion, useMotionValue, useReducedMotion, useSpring } from "motion/react";
+import {
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  useSyncExternalStore,
+  type PointerEvent,
+  type ReactNode,
+} from "react";
+import {
+  AnimatePresence,
+  motion,
+  useInView,
+  useMotionValue,
+  useReducedMotion,
+  useSpring,
+} from "motion/react";
 import { ChevronLeft, MoreVertical } from "lucide-react";
 import { easeOutExpo } from "@/lib/motion";
 import { cn } from "@/lib/utils";
@@ -21,6 +36,25 @@ export type PhoneScreen = {
 
 const AUTOPLAY_MS = 5600;
 
+const FINE_POINTER = "(hover: hover) and (pointer: fine)";
+
+/**
+ * Есть ли у устройства мышь. На сервере и до гидратации отвечаем «нет»:
+ * на телефоне наклон корпуса не нужен, а его motion-значения держали бы
+ * мокап в отдельном трёхмерном слое и подтормаживали прокрутку.
+ */
+function useFinePointer() {
+  return useSyncExternalStore(
+    (notify) => {
+      const query = window.matchMedia(FINE_POINTER);
+      query.addEventListener("change", notify);
+      return () => query.removeEventListener("change", notify);
+    },
+    () => window.matchMedia(FINE_POINTER).matches,
+    () => false,
+  );
+}
+
 /**
  * Мокап смартфона с обвязкой Telegram Mini App.
  * Экраны настоящие: по ним можно ходить нажатиями, листать свайпом
@@ -36,7 +70,12 @@ export function PhoneMockup({
   appName: string;
 }) {
   const reduceMotion = useReducedMotion();
+  const canTilt = useFinePointer();
   const screens = useMemo(() => buildScreens(app, labels), [app, labels]);
+
+  // Пока мокап за пределами экрана, переключать в нём нечего
+  const rootRef = useRef<HTMLDivElement>(null);
+  const inView = useInView(rootRef, { margin: "200px" });
 
   const [index, setIndex] = useState(0);
   const [direction, setDirection] = useState(1);
@@ -48,7 +87,7 @@ export function PhoneMockup({
   const rotateX = useSpring(rawY, { stiffness: 140, damping: 18, mass: 0.5 });
 
   useEffect(() => {
-    if (touched || reduceMotion || screens.length < 2) return;
+    if (!inView || touched || reduceMotion || screens.length < 2) return;
 
     const timer = window.setInterval(() => {
       setDirection(1);
@@ -56,7 +95,7 @@ export function PhoneMockup({
     }, AUTOPLAY_MS);
 
     return () => window.clearInterval(timer);
-  }, [touched, reduceMotion, screens.length]);
+  }, [inView, touched, reduceMotion, screens.length]);
 
   function goToIndex(next: number) {
     setDirection(next > index ? 1 : -1);
@@ -85,17 +124,20 @@ export function PhoneMockup({
   const screen = screens[index];
 
   return (
-    <div className="flex flex-col items-center">
+    <div ref={rootRef} className="flex flex-col items-center">
       <motion.div
-        onPointerMove={handleTilt}
-        onPointerLeave={resetTilt}
-        style={{ rotateX, rotateY, transformPerspective: 1400 }}
+        // Наклон только там, где есть мышь. На телефоне не вешаем ни
+        // обработчиков, ни трёхмерного стиля: иначе браузер держит мокап
+        // в отдельном слое и перерисовывает его на каждый кадр прокрутки
+        onPointerMove={canTilt ? handleTilt : undefined}
+        onPointerLeave={canTilt ? resetTilt : undefined}
+        style={canTilt ? { rotateX, rotateY, transformPerspective: 1400 } : undefined}
         className="relative w-[272px] shrink-0 sm:w-[300px]"
       >
         <div className="bg-coal-800 relative rounded-[2.6rem] border border-white/15 p-[9px] shadow-[0_20px_40px_-20px_#000] md:shadow-[0_50px_120px_-50px_#000]">
           <div className="pointer-events-none absolute inset-0 rounded-[2.6rem] bg-linear-to-b from-white/10 via-transparent to-transparent" />
 
-          <div className="bg-void relative flex aspect-[9/19] flex-col overflow-hidden rounded-[2.1rem]">
+          <div className="phone-screen bg-void relative flex aspect-[9/19] flex-col overflow-hidden rounded-[2.1rem]">
             <div className="absolute top-2 left-1/2 z-30 h-[18px] w-[72px] -translate-x-1/2 rounded-full bg-black" />
 
             {/* Статус-бар */}
@@ -144,6 +186,9 @@ export function PhoneMockup({
                   key={screen.id}
                   custom={direction}
                   drag={screens.length > 1 ? "x" : false}
+                  // Направление определяется один раз за жест: вертикальная
+                  // прокрутка пальцем перестаёт спорить с горизонтальным свайпом
+                  dragDirectionLock
                   dragConstraints={{ left: 0, right: 0 }}
                   dragElastic={0.12}
                   onDragStart={() => setTouched(true)}

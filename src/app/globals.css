@@ -219,6 +219,11 @@
   .marquee-track {
     will-change: transform;
   }
+
+  /* Экран мокапа: перерисовка не выходит за его границы */
+  .phone-screen {
+    contain: paint;
+  }
 }
 
 @keyframes marquee {
