@@ -101,6 +101,7 @@ export const en: Dictionary = {
       "Two projects live in Telegram right now. Both built entirely by me: interface, server, database, bot, payments and deployment.",
     openInTelegram: "Open in Telegram",
     stackLabel: "Stack",
+    mockupHint: "live interface — swipe and tap",
     items: [
       {
         slug: "promt-shop",

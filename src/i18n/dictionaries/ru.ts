@@ -99,6 +99,7 @@ export const ru = {
       "Два проекта, которые живут в Telegram прямо сейчас. Оба сделаны целиком мной: интерфейс, сервер, база, бот, оплата и деплой.",
     openInTelegram: "Открыть в Telegram",
     stackLabel: "Стек",
+    mockupHint: "живой интерфейс — листай и нажимай",
     items: [
       {
         slug: "promt-shop",
