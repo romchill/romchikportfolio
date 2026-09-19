@@ -25,6 +25,8 @@ jobs:
 
   docker:
     name: Сборка образа
+    # На main образ собирает и публикует деплой, дублировать незачем
+    if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7

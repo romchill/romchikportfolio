@@ -65,11 +65,54 @@ npm run docker:prod
 (gzip, вечный кэш хэшированных бандлов, security-заголовки). Сайт — на
 http://localhost, проверка живости — http://localhost/api/health
 
-## Продакшен с HTTPS
+## Выкладка на свой сервер
 
-### 1. Подготовка
+Пошагово, от пустого VPS до работающего сайта на своём домене.
+Сборка образа идёт в GitHub Actions, поэтому серверу хватает 1 ГБ памяти:
+`next build` съедает под 2 ГБ, и на дешёвом тарифе он бы не собрался.
 
-В `.env` заполнить:
+### 1. Что купить
+
+| Что         | Ориентир по цене  | Требования                          |
+| ----------- | ----------------- | ----------------------------------- |
+| Домен `.ru` | ~250 ₽ первый год | любой регистратор                   |
+| VPS         | ~150–400 ₽/мес    | 1 ГБ RAM, 10 ГБ диска, Ubuntu 24.04 |
+
+### 2. Направить домен на сервер
+
+В панели регистратора добавить две A-записи на IP сервера:
+
+```
+@     A     123.45.67.89
+www   A     123.45.67.89
+```
+
+Записи расходятся по интернету от нескольких минут до пары часов.
+Проверить: `nslookup твой-домен`
+
+### 3. Поставить Docker на сервер
+
+```bash
+ssh root@123.45.67.89
+```
+
+```bash
+curl -fsSL https://get.docker.com | sh
+```
+
+### 4. Забрать проект
+
+```bash
+git clone https://github.com/romchill/romchikportfolio.git /opt/portfolio && cd /opt/portfolio
+```
+
+### 5. Прописать домен
+
+```bash
+cp .env.example .env && nano .env
+```
+
+Заполнить три строки:
 
 ```
 NEXT_PUBLIC_SITE_URL=https://твой-домен
@@ -77,52 +120,85 @@ DOMAIN=твой-домен
 CERTBOT_EMAIL=почта@для-уведомлений
 ```
 
-`NEXT_PUBLIC_SITE_URL` попадает в canonical, `og:url`, `sitemap.xml` и
-`robots.txt` — без него ссылки уедут на localhost. Важно: адрес **запекается
-на этапе сборки**, а не читается при запуске, поэтому compose передаёт его
-build-аргументом. После смены домена контейнер нужно пересобрать
-(`up -d --build`), простого перезапуска мало.
+Тот же адрес нужно положить в переменную репозитория на GitHub:
+**Settings → Secrets and variables → Actions → Variables → New variable**,
+имя `SITE_URL`, значение `https://твой-домен`. Адрес попадает в образ
+на сборке, поэтому без него в карте сайта останется localhost.
 
-A-запись домена (и `www`) должна указывать на IP сервера **до** выпуска
-сертификата, иначе проверка Let's Encrypt не пройдёт.
+### 6. Выпустить сертификат
 
-### 2. Разовый выпуск сертификата
-
-Nginx не стартует без сертификата, поэтому сначала поднимаем только его
-временный HTTP-блок и получаем ключи:
+Nginx не стартует без ключей, поэтому первый сертификат берём отдельно —
+пока порт 80 свободен:
 
 ```bash
-docker compose -f docker-compose.prod.yml run --rm --service-ports --entrypoint "certbot certonly --standalone -d $DOMAIN -d www.$DOMAIN --email $CERTBOT_EMAIL --agree-tos --no-eff-email" certbot
+docker run --rm -p 80:80 -v portfolio_certbot-conf:/etc/letsencrypt -v portfolio_certbot-www:/var/www/certbot certbot/certbot certonly --standalone -d "$DOMAIN" -d "www.$DOMAIN" --email "$CERTBOT_EMAIL" --agree-tos --no-eff-email
 ```
 
-### 3. Запуск
+Дальше сертификат продлевается сам — за это отвечает контейнер `certbot`.
+
+### 7. Запустить
+
+Образ уже собран в GitHub Actions и лежит в GHCR. Один раз сделай пакет
+публичным, иначе сервер его не скачает: страница репозитория → **Packages**
+→ `romchikportfolio` → **Package settings** → **Change visibility** → Public.
 
 ```bash
-docker compose -f docker-compose.prod.yml up -d --build
+docker compose -f docker-compose.prod.yml pull web
 ```
 
-Что внутри:
+```bash
+docker compose -f docker-compose.prod.yml up -d
+```
 
-| Сервис    | Роль                                                                     |
-| --------- | ------------------------------------------------------------------------ |
-| `web`     | Next standalone, файловая система только на чтение, не-root, healthcheck |
-| `nginx`   | HTTP → HTTPS, TLS 1.2/1.3, HSTS с preload, gzip, кэш статики             |
-| `certbot` | проверяет сертификат дважды в сутки и продлевает, когда подходит срок    |
-
-Конфиг Nginx собирается из шаблона: `${DOMAIN}` подставляется при старте
-контейнера, поэтому домен меняется одной правкой `.env`.
+Готово — сайт открывается по HTTPS.
 
 ```bash
 docker compose -f docker-compose.prod.yml logs -f
 ```
 
+### 8. Включить автодеплой
+
+Чтобы каждый пуш в `main` сам приезжал на сервер, заведи ключ:
+
+```bash
+ssh-keygen -t ed25519 -C github-deploy -f ~/.ssh/deploy -N ""
+```
+
+```bash
+cat ~/.ssh/deploy.pub >> ~/.ssh/authorized_keys && cat ~/.ssh/deploy
+```
+
+И пропиши в репозитории, **Settings → Secrets and variables → Actions**:
+
+| Тип      | Имя              | Значение                       |
+| -------- | ---------------- | ------------------------------ |
+| Secret   | `SSH_HOST`       | IP сервера                     |
+| Secret   | `SSH_USER`       | `root` или твой пользователь   |
+| Secret   | `SSH_KEY`        | всё содержимое `~/.ssh/deploy` |
+| Variable | `DEPLOY_ENABLED` | `true`                         |
+| Variable | `DEPLOY_PATH`    | `/opt/portfolio`               |
+
+Пока `DEPLOY_ENABLED` не выставлена, шаг деплоя тихо пропускается — пуши
+не будут падать из-за отсутствующего сервера.
+
+### Что где лежит
+
+| Сервис    | Роль                                                                     |
+| --------- | ------------------------------------------------------------------------ |
+| `web`     | Next standalone, не-root, файловая система только на чтение, healthcheck |
+| `nginx`   | HTTP → HTTPS, TLS 1.2/1.3, HSTS с preload, gzip, кэш статики             |
+| `certbot` | проверяет сертификат дважды в сутки и продлевает, когда подходит срок    |
+
+Конфиг Nginx собирается из шаблона: `${DOMAIN}` подставляется при старте,
+так что смена домена — это одна правка `.env` и перезапуск.
+
 ## CI и деплой
 
-- `.github/workflows/ci.yml` — на каждый push и pull request: типы, линт,
-  формат, сборка и сборка Docker-образа.
-- `.github/workflows/deploy.yml` — запускается вручную, заходит по SSH на
-  сервер, подтягивает изменения и пересобирает контейнеры. Нужны секреты
-  репозитория `SSH_HOST`, `SSH_USER`, `SSH_KEY`.
+- `ci.yml` — на каждый push и pull request: типы, линт, формат, сборка.
+  Образ дополнительно проверяется на pull request.
+- `deploy.yml` — на push в `main`: собирает образ, кладёт в GHCR и, если
+  включён `DEPLOY_ENABLED`, обновляет контейнеры на сервере по SSH.
+  Можно запустить руками: **Actions → Deploy → Run workflow**.
 
 ## Структура
 
